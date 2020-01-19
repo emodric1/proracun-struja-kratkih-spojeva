@@ -1,0 +1,121 @@
+\subsection{Određivanje vrijednosti upravljačkog napona pumpe}
+
+S ciljem određivanja tražene vrijednosti upravljačkog napona pumpe $u_{0}$ koja održava nivo u rezervoaru na nivou $h_{0}$, na ulaz sistema su dovođene različite vrijednosti napona u opsegu 0 - 10 V. Određeno je da se za vrijednost napona $u_{0} = 8.1 V$ na izlazu održava vrijednost nivoa $h_{0} = 17 cm$.
+
+\subsection{Odziv sistema na dovođenje step ulaza}
+
+Kada se umjesto napona $u_{0}$ na ulaz dovede step amplitude 10 V, na izlazu sistema se dobije odziv prikazan na slici \ref{referenca}.
+
+\begin{center}
+    \captionsetup{type=figure}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{slike/imeslike.eps}
+        \caption{ime slike}
+        \label{referenca}
+    \end{center}
+\end{center}
+
+Kako je dinamika sistema modelirana prenosnom funkcijom integratora, možemo zaključiti da je dobiveni odziv sistema očekivan. 
+
+\subsection{Određivanje pojačanja K iz snimljenog odziva}
+
+
+Koeficijent pojačanja K, koji odgovara snimljenom odzivu sistema, određujemo sa linearnog dijela karakteristike prikazane na slici \ref{S4}. Koeficijent pojačanja određujemo na način da odaberemo 2 susjedna uzorka, te potom razliku njihovih amplituda podijelimo sa korakom (koeficijent pojačanja je zapravo jednak nagibu linearnog dijela karakteristike). \\
+
+Pojačanje aproksimativnog modela sistema dobivenog na opisani način, uz očitavanje potrebnih podataka sa slike \ref{S4}, iznosi $K = 0.05$.
+
+\subsection{Diskretizacija sistema i predstavljanje sistema u prostoru stanja}
+
+Sistem zadan prenosnom funkcijom 1.2 najprije diskretiziramo korakom diskretizacije $T = 0.01 s$, a potom ga prevodimo u prostor stanja korištenjem Matlab koda prikazanog u nastavku.
+
+\lstinputlisting[language=python,style=Style1]{diskretizacija_PS.m}
+
+Nakon pokretanja koda dobijamo zapis u prostoru stanja:
+
+\begin{equation}
+    x[k + 1] = x[k] + 0.03125 \cdot u[k]
+\end{equation}
+
+\begin{equation}
+    y[k] = 0.016 \cdot x[k]
+\end{equation}
+
+
+\subsection{Određivanje pojačanja LQR}
+Napisan je M-fajl koji riješava Riccatijevu jednačinu i određena su pojačanja regulatora za sve
+slučajeve iz tabele date u postavci zadatka. Korišteni kod je prikazan u nastavku.
+\lstinputlisting[language=python,style=Style1]{rikati.m}
+
+\noindent Za podatke $h_0=17$ i $h_N=22$, dobijena vremenska promjena vektora ulaza na pumpu i stanja sistema je prikazana na slici \ref{grafik1}.
+
+\begin{center}
+    \captionsetup{type=figure}
+    \begin{center}
+        \includegraphics[width=\textwidth]{slike/12_22_120.png}
+        \caption{Vremenska promjena ulaza i stanja}
+        \label{grafik1}
+    \end{center}
+\end{center}
+
+Ovakvo rješenje je dobijeno za vrijednost $T_N(s)=120s$, budući da za vrijednosti $T_N(s)=10s$ i $T_N(s)=20s$ sistem ne dostigne stacionarno stanje, kao što se vidi na slikama \ref{grafik2} i \ref{grafik3}.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{0.47\textwidth}
+    \includegraphics[width=\textwidth]{slike/10.png}
+    \caption{Grafici za $T_N=10s$}
+    \label{grafik2}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.47\textwidth}
+    \includegraphics[width=\textwidth]{slike/20.png}
+    \caption{Grafici za T_N=20s}
+    \label{grafik3}
+  \end{minipage}
+\end{figure}
+
+\subsection{Simulacija ponašanja sistema sa dizajniranim LQR}
+U cilju realizacije ovog dijela vježbe, izvršena je modifikacija originalnog
+modela sistema, u smislu da se kao ulazni signal u pumpu koriste upravljački
+signali proračunati u prethodnom dijelu vježbe. Modifikovani model je
+predstavljen na slici (\ref{slikaMod}).
+
+\begin{center}
+    \captionsetup{type=figure}
+    \begin{center}
+        \includegraphics[width=\textwidth]{slike/slikaMod.png}
+        \caption{Modifikovani simulink model}
+        \label{slikaMod}
+    \end{center}
+\end{center}
+
+Sa slike (\ref{posljednja}) možemo vidjeti da je odziv sistema nije u skladu sa očekivanim, što najviše pokazuje zadnja tačka, koja ne odgovara zadatoj vrijednosti. Uzrok ovome je vjerovatno pogrešan model sistema u SIMULINK-u u odnosu na realni model u laboratoriji. Ono što je potrebno napomenuti jeste da je vrijeme simuliranja sistema povecano sa 20s na 110s.
+
+\begin{center}
+    \captionsetup{type=figure}
+    \begin{center}
+        \includegraphics[width=\textwidth]{slike/posljednja.png}
+        \caption{Odziv simuliranog sistema sa linearnim kvadratnim regulatorom}
+        \label{posljednja}
+    \end{center}
+\end{center}
+
+\subsection{Ponašanje stvarnog sistema sa dizajniranim LQR}
+Kako u sklopu za pripreme za laboratorijsku vježbu nismo odradili ovakvu pripremu koju smo prikazali u izvještaju, to nismo uspijeli dobiti adekvatno ponašanje sistema sa dizajniranim LQR-om. Ideja je da se dobijeni parametri regulatora i ulazi unesu u upravljačku petlju te da se posmatra ponašanje realnog sistema u odnosu na simulirani.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
